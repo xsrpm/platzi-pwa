@@ -1,6 +1,6 @@
 import 'isomorphic-fetch'
 
-const baseUrl = 'https://www.themealdb.com/api/json/v1/1'
+const baseUrl = 'https://www.themealdb.com/api/json/v2/1'
 
 export default {
   getLatest,
@@ -18,7 +18,7 @@ async function getLatest() {
 async function getRecipe(recipeId) {
   const request = await fetch(`${baseUrl}/lookup.php?i=${recipeId}`)
   const data = await request.json()
-  if( ! data.meals ) return null
+  if (!data.meals) return null
   const recipe = normalizeMeal(data.meals.shift())
 
   return recipe
@@ -31,7 +31,9 @@ function normalizeMeal(meal) {
   newMeal.name = meal.strMeal
   newMeal.category = meal.strCategory
   newMeal.origin = meal.strArea
-  newMeal.instructions = meal.strInstructions.split('\n').filter((i) => i.trim() !== '')
+  newMeal.instructions = meal.strInstructions
+    .split('\n')
+    .filter((i) => i.trim() !== '')
   newMeal.thumbnail = meal.strMealThumb
   newMeal.tags = meal.strTags ? meal.strTags.split(',') : []
   newMeal.youtube = meal.strYoutube
@@ -39,8 +41,8 @@ function normalizeMeal(meal) {
   newMeal.url = meal.strSource
   newMeal.dateModified = meal.dateModified
 
-  for( let i=1; i<=20; i++ ) {
-    if( meal[`strIngredient${i}`] !== '' && meal[`strMeasure${i}`] !== '' ) {
+  for (let i = 1; i <= 20; i++) {
+    if (meal[`strIngredient${i}`] !== '' && meal[`strMeasure${i}`] !== '') {
       newMeal.ingredients.push({
         ingredient: meal[`strIngredient${i}`],
         measure: meal[`strMeasure${i}`]
@@ -50,5 +52,3 @@ function normalizeMeal(meal) {
 
   return newMeal
 }
-
-
